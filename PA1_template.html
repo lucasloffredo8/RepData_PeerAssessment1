@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>Loading and preprocessing the data</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h2>Loading and preprocessing the data</h2>
+
+<p>x &lt;- read.csv(&ldquo;activity.csv&rdquo;)</p>
+
+<h2>What is mean total number of steps taken per day?</h2>
+
+<p>dates1 &lt;- levels(x[[&ldquo;date&rdquo;]])
+y &lt;- transform(x, date = as.character(date))
+stepSumList &lt;- as.character(vector())
+for(i in dates1){
+  eachDay &lt;- y[y$date == i, ]
+  daySum &lt;- sum(eachDay[[&ldquo;steps&rdquo;]])
+  stepSumList &lt;- c(stepSumList, daySum)
+}
+Steps &lt;- as.numeric(stepSumList)
+hist(Steps)
+median(Steps, na.rm = TRUE)
+mean(Steps, na.rm = TRUE)</p>
+
+<h2>What is the average daily activity pattern?</h2>
+
+<p>q &lt;- x[1:288, ]
+ints1 &lt;- q[[&ldquo;interval&rdquo;]]
+Steps1 &lt;- as.numeric(vector())
+for(i in ints1){
+  eachInt &lt;- x[x$interval == i, ]
+  intAvg &lt;- mean(eachInt[[&ldquo;steps&rdquo;]], na.rm = TRUE)
+  Steps1 &lt;- c(Steps1, intAvg)
+}
+plot(ints1, Steps1)
+gg &lt;- cbind(as.data.frame(ints1), as.data.frame(Steps1))
+hh &lt;- gg[gg$Steps1 == max(gg[[&ldquo;Steps1&rdquo;]]), ]
+hh[[&ldquo;ints1&rdquo;]]</p>
+
+<h2>Imputing missing values</h2>
+
+<p>test &lt;- is.na(x[[&ldquo;steps&rdquo;]])
+length(test[test == TRUE])
+q &lt;- x[1:288, ]
+ints1 &lt;- q[[&ldquo;interval&rdquo;]]
+xAll &lt;- read.csv(&ldquo;activity.csv&rdquo;)
+for(i in ints1){
+  eachInt &lt;- x[x$interval == i, ]
+  intAvg &lt;- mean(eachInt[[&ldquo;steps&rdquo;]], na.rm = TRUE)
+  xAll[is.na(xAll) &amp; xAll$interval == i] &lt;- intAvg
+}
+dates1All &lt;- levels(xAll[[&ldquo;date&rdquo;]])
+yAll &lt;- transform(xAll, date = as.character(date))
+stepSumListAll &lt;- as.character(vector())
+for(i in dates1All){
+  eachDayAll &lt;- yAll[yAll$date == i, ]
+  daySumAll &lt;- sum(eachDayAll[[&ldquo;steps&rdquo;]])
+  stepSumListAll &lt;- c(stepSumListAll, daySumAll)
+}
+StepsAll &lt;- as.numeric(stepSumListAll)
+hist(StepsAll)
+median(StepsAll)
+mean(StepsAll)</p>
+
+<h2>Are there differences in activity patterns between weekdays and weekends?</h2>
+
+<p>xx &lt;- transform(xAll, date = strptime(x[, &ldquo;date&rdquo;], &ldquo;%Y-%m-%d&rdquo;))
+xxx &lt;- cbind(xAll, weekdayweekend = weekdays(xx[[&ldquo;date&rdquo;]]))
+xxxx &lt;- transform(xxx, weekdayweekend = as.character(weekdayweekend))
+xxxx$weekdayweekend[xxxx$weekdayweekend %in% &ldquo;Monday&rdquo;] &lt;- &ldquo;Weekday&rdquo;
+xxxx$weekdayweekend[xxxx$weekdayweekend %in% &ldquo;Tuesday&rdquo;] &lt;- &ldquo;Weekday&rdquo;
+xxxx$weekdayweekend[xxxx$weekdayweekend %in% &ldquo;Wednesday&rdquo;] &lt;- &ldquo;Weekday&rdquo;
+xxxx$weekdayweekend[xxxx$weekdayweekend %in% &ldquo;Thursday&rdquo;] &lt;- &ldquo;Weekday&rdquo;
+xxxx$weekdayweekend[xxxx$weekdayweekend %in% &ldquo;Friday&rdquo;] &lt;- &ldquo;Weekday&rdquo;
+xxxx$weekdayweekend[xxxx$weekdayweekend %in% &ldquo;Saturday&rdquo;] &lt;- &ldquo;Weekend&rdquo;
+xxxx$weekdayweekend[xxxx$weekdayweekend %in% &ldquo;Sunday&rdquo;] &lt;- &ldquo;Weekend&rdquo;
+xxxxx &lt;- transform(xxxx, weekdayweekend = as.factor(weekdayweekend))
+xWeekday &lt;- xxxxx[xxxxx$weekdayweekend == &ldquo;Weekday&rdquo;, ]
+xWeekend &lt;- xxxxx[xxxxx$weekdayweekend == &ldquo;Weekend&rdquo;, ]
+q &lt;- x[1:288, ]
+ints &lt;- q[[&ldquo;interval&rdquo;]]
+stepsWeekday &lt;- as.numeric(vector())
+for(i in ints){
+  eachIntWd &lt;- xWeekday[xWeekday$interval == i, ]
+  intAvgWd &lt;- mean(eachIntWd[[&ldquo;steps&rdquo;]])
+  stepsWeekday &lt;- c(stepsWeekday, intAvgWd)
+}
+plot(ints, stepsWeekday)
+stepsWeekend &lt;- as.numeric(vector())
+for(i in ints){
+  eachIntWe &lt;- xWeekend[xWeekend$interval == i, ]
+  intAvgWe &lt;- mean(eachIntWe[[&ldquo;steps&rdquo;]])
+  stepsWeekend &lt;- c(stepsWeekend, intAvgWe)
+}
+plot(ints, stepsWeekend)</p>
+
+</body>
+
+</html>
